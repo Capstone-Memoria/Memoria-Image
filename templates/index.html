@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SDXL Image Generation</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 40px auto;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+      }
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box; /* Avoids padding issues */
+        resize: vertical; /* Allow vertical resizing */
+      }
+      button {
+        background-color: #5c67f2;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+      }
+      button:hover {
+        background-color: #4a54e1;
+      }
+      #result {
+        margin-top: 30px;
+        text-align: center;
+      }
+      #result img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      #loading {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+        color: #555;
+      }
+      .error {
+        color: red;
+        text-align: center;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SDXL Image Generation</h1>
+      <form id="generate-form">
+        <label for="prompt">Positive Prompt:</label>
+        <textarea id="prompt" name="prompt" rows="3" required></textarea>
+
+        <label for="negative_prompt">Negative Prompt:</label>
+        <textarea
+          id="negative_prompt"
+          name="negative_prompt"
+          rows="2"
+        ></textarea>
+
+        <button type="submit">Generate Image</button>
+      </form>
+
+      <div id="loading">Generating image... Please wait.</div>
+      <div id="result">
+        <!-- Generated image will be displayed here -->
+      </div>
+      <div id="error-message" class="error"></div>
+    </div>
+
+    <script>
+      const form = document.getElementById("generate-form");
+      const resultDiv = document.getElementById("result");
+      const loadingDiv = document.getElementById("loading");
+      const errorDiv = document.getElementById("error-message");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        loadingDiv.style.display = "block";
+        resultDiv.innerHTML = ""; // Clear previous result
+        errorDiv.textContent = ""; // Clear previous error
+
+        const formData = new FormData(form);
+
+        try {
+          const response = await fetch("/generate", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+          loadingDiv.style.display = "none";
+
+          if (response.ok && data.image) {
+            const img = document.createElement("img");
+            img.src = `data:image/png;base64,${data.image}`;
+            img.alt = "Generated Image";
+            resultDiv.appendChild(img);
+          } else {
+            // Display error message from server response or a generic one
+            errorDiv.textContent =
+              data.error || `Error: ${response.status} ${response.statusText}`;
+          }
+        } catch (error) {
+          loadingDiv.style.display = "none";
+          console.error("Error during fetch:", error);
+          errorDiv.textContent = `An error occurred: ${error.message}. Check the console for details.`;
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+# requirements.txt
+fastapi
+uvicorn[standard]
+torch --index-url https://download.pytorch.org/whl/cu118 # Assuming CUDA 11.8, adjust if needed
+diffusers
+transformers
+accelerate
+invisible-watermark>=0.2.0
+safetensors
+pillow
+requests
+jinja2
+python-multipart
