@@ -103,7 +103,7 @@ async def generate_image(
             prompt=prompt,
             negative_prompt=negative_prompt,
             num_inference_steps=20, # Adjust as needed
-            guidance_scale=7.0,     # Adjust as needed
+            guidance_scale=3.0,     # Adjust as needed
             height=1024,
             width=1024
         ).images[0]
