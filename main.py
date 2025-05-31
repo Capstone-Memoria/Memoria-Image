@@ -65,7 +65,14 @@ def load_pipeline():
             use_safetensors=True
         )
         pipe.to(DEVICE)
-        print("Pipeline loaded successfully.")
+        # VRAM optimizations
+        print("Enabling xformers memory efficient attention for VRAM optimization...")
+        pipe.enable_xformers_memory_efficient_attention()
+        print("Enabling model CPU offload for VRAM optimization...")
+        pipe.enable_model_cpu_offload()
+        print("Enabling attention slicing for VRAM optimization...")
+        pipe.enable_attention_slicing()
+        print("Pipeline loaded successfully with memory optimizations.")
     except Exception as e:
         print(f"Error loading pipeline: {e}")
         raise RuntimeError("Failed to load the SDXL pipeline.") from e
@@ -126,7 +133,7 @@ async def generate_image(
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # --- Run with Uvicorn (for development) ---
-# if __name__ == "__main__":
-#     import uvicorn
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 # Note: Running with `uvicorn main:app --reload` is recommended for development.
